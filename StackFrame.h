@@ -15,11 +15,12 @@ class StackFrame
     int opStackIndex;
     int localVarArrIndex;
     int lineCount;
- public :
-        /*
-        Constructor of StackFrame
-        */
-        StackFrame();
+
+public:
+    /*
+    Constructor of StackFrame
+    */
+    StackFrame();
 
     /*
     Run the method written in the testcase
@@ -28,8 +29,8 @@ class StackFrame
     void elementBreakdowm(std::string inputLine, std::string *command, std::string *argument);
     void opStackPop(float *value, float *type);
     void opStackPush(float value, float type);
-    void localVarArrLoad(int index,float *value, float *type);
-    void localVarArrStore(int index,float value, float type);
+    void localVarArrLoad(int index, float *value, float *type);
+    void localVarArrStore(int index, float value, float type);
     int commandSpecification(std::string *command);
     void commandExecution(std::string command, std::string argument);
     void run(std::string filename);
