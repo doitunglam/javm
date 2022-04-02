@@ -25,13 +25,13 @@ class StackFrame
     Run the method written in the testcase
     @param filename name of the file
     */
-    void elementBreakdowm(string inputLine, string *command, string *argument);
+    void elementBreakdowm(std::string inputLine, std::string *command, std::string *argument);
     void opStackPop(float *value, float *type);
     void opStackPush(float value, float type);
     void localVarArrLoad(int index,float *value, float *type);
     void localVarArrStore(int index,float value, float type);
-    int commandSpecification(string *command);
-    void commandExecution(string command, string argument);
+    int commandSpecification(std::string *command);
+    void commandExecution(std::string command, std::string argument);
     void run(std::string filename);
 };
 
