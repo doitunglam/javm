@@ -179,7 +179,7 @@ void StackFrame::commandExecution(string command, string argument)
             opStackPush(value1, 1);
         if (command == "2i")
             {
-                int value1i=(int)value1 - 0.5;
+                int value1i=(int)value1;
                 opStackPush(value1, 0);
             }
     }
