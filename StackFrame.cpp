@@ -180,7 +180,8 @@ void StackFrame::commandExecution(string command, string argument)
         if (command == "2i")
             {
                 int value1i=(int)value1;
-                opStackPush(value1, 0);
+                float value1f=(float) value1i;
+                opStackPush(value1f, 0);
             }
     }
     // nhom lenh nap va luu
