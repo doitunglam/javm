@@ -13,6 +13,13 @@ StackFrame::StackFrame() : opStackMaxSize(OPERAND_STACK_MAX_SIZE), localVarArrSi
     for (int i = 0; i < localVarArrSize; i += 2)
         localVarArr[i] = -1;
 }
+bool StackFrame::valueType(string tar)
+{
+    std::size_t found = tar.find('.');
+    if (found != std::string::npos)
+        return 1;
+    return 0;
+}
 void StackFrame::elementBreakdowm(string inputLine, string *command, string *argument)
 {
     string element[2] = {};
@@ -36,7 +43,7 @@ void StackFrame::opStackPop(float *value, float *type)
 }
 void StackFrame::opStackPush(float value, float type)
 {
-    if (opStackIndex > opStackMaxSize)
+    if (opStackIndex > opStackMaxSize - 1)
         throw StackFull(lineCount);
     opStack[opStackIndex] = value;
     opStackIndex++;
@@ -84,13 +91,13 @@ void StackFrame::commandExecution(string command, string argument)
     {
         float type1, value1;
         opStackPop(&value1, &type1);
-        if (type == 0 && (int)type1 == 1)
-            throw TypeMisMatch(lineCount);
         float type2, value2;
         opStackPop(&value2, &type2);
+        if (type == 0 && (int)type1 == 1)
+            throw TypeMisMatch(lineCount);
         if (type == 0 && (int)type2 == 1)
             throw TypeMisMatch(lineCount);
-        int ans;
+        float ans;
         if (command == "add")
             ans = value1 + value2;
         if (command == "sub")
@@ -124,22 +131,22 @@ void StackFrame::commandExecution(string command, string argument)
         }
         if (command == "eq")
         {
-            ans = (int)value2 == (int)value1;
+            ans = value2 == value1;
             returnType = 0;
         }
         if (command == "neq")
         {
-            ans = (int)value2 != (int)value1;
+            ans = value2 != value1;
             returnType = 0;
         }
         if (command == "lt")
         {
-            ans = (int)value2 < (int)value1;
+            ans = value2 < value1;
             returnType = 0;
         }
         if (command == "gt")
         {
-            ans = (int)value2 > (int)value1;
+            ans = value2 > value1;
             returnType = 0;
         }
         opStackPush(ans, returnType);
@@ -171,13 +178,20 @@ void StackFrame::commandExecution(string command, string argument)
         if (command == "2f")
             opStackPush(value1, 1);
         if (command == "2i")
-            opStackPush(value1, 0);
+            {
+                int value1i=(int)value1 - 0.5;
+                opStackPush(value1, 0);
+            }
     }
     // nhom lenh nap va luu
     if (command == "const" || command == "load" || command == "store")
     {
         if (command == "const")
+        {
+            if (valueType(argument)!=(int)type)
+                throw TypeMisMatch(lineCount);
             opStackPush(atof(charArr), type);
+        }
         if (command == "load")
         {
             int index = atoi(charArr);
@@ -189,6 +203,8 @@ void StackFrame::commandExecution(string command, string argument)
         {
             float value1, type1;
             opStackPop(&value1, &type1);
+            if (type!=(int)type1)
+                throw TypeMisMatch(lineCount);
             int index = atoi(charArr);
             localVarArrStore(index, value1, type1);
         }
@@ -216,11 +232,11 @@ void StackFrame::commandExecution(string command, string argument)
 }
 void StackFrame::run(string filename)
 {
-    lineCount++;
     ifstream file(filename);
     string inputLine;
     while (getline(file, inputLine))
     {
+        lineCount++;
         string command = "",
                argument = "";
         elementBreakdowm(inputLine, &command, &argument);

@@ -33,6 +33,7 @@ public:
     void localVarArrStore(int index, float value, float type);
     int commandSpecification(std::string *command);
     void commandExecution(std::string command, std::string argument);
+    bool valueType(std::string tar);
     void run(std::string filename);
 };
 
