@@ -56,7 +56,8 @@ StackFrame::treeNode *StackFrame::leftRotate(treeNode *x)
 }
 int StackFrame::getHeight(treeNode *N)
 {
-    if(N==NULL) return 0;
+    if (N == NULL)
+        return 0;
     return N->height;
 }
 int StackFrame::getBalance(treeNode *N)
@@ -65,22 +66,37 @@ int StackFrame::getBalance(treeNode *N)
         return 0;
     return getHeight(N->left) - getHeight(N->right);
 }
+bool StackFrame::cmp(string s1, string s2)
+{
+    int n = s1.length() > s2.length() ? s1.length() : s2.length();
+    for (int i = 0; i < n; i++)
+    {
+        if (s1[i] - s2[i] > 0)
+            return 1;
+        if (s1[i] - s2[i] < 0)
+            return 0;
+    }
+    if (s1.length() > s2.length())
+        return 1;
+    else
+        return 0;
+}
 StackFrame::treeNode *StackFrame::insert(treeNode *treeNode, string key, float value, float type)
 {
     currentLocalVarSpaceSize++;
+    if(currentLocalVarSpaceSize>=localVarSpaceSize) throw LocalSpaceFull(lineCount);
     /* 1. Perform the normal BST insertion */
     if (treeNode == NULL)
         return (new StackFrame::treeNode(key, value, type));
-
-    if (key < treeNode->key)
+    if (cmp(key, treeNode->key) == 0)
         treeNode->left = insert(treeNode->left, key, value, type);
-    else if (key > treeNode->key)
+    else if (cmp(key, treeNode->key) == 1)
         treeNode->right = insert(treeNode->right, key, value, type);
     else // Equal keys are not allowed in BST
         return treeNode;
 
     /* 2. Update height of this ancestor treeNode */
-   treeNode->height = getHeight(treeNode->left) > getHeight(treeNode->right) ? getHeight(treeNode->left) : getHeight(treeNode->right) + 1;
+    treeNode->height = getHeight(treeNode->left) > getHeight(treeNode->right) ? getHeight(treeNode->left) : getHeight(treeNode->right) + 1;
 
     /* 3. Get the balance factor of this ancestor
         treeNode to check whether this treeNode became
@@ -152,7 +168,45 @@ void StackFrame::opStackPush(float value, float type)
     opStack[opStackIndex] = type;
     opStackIndex++;
 }
-
+StackFrame::treeNode *StackFrame::load(treeNode *treeNode, string key, float *value, float *type)
+{
+    if (treeNode->key == key)
+    {
+        (*value) = treeNode->value;
+        (*type) = treeNode->type;
+        return treeNode;
+    }
+    if (treeNode == NULL)
+        return NULL;
+    if (cmp(treeNode->key, key) == 0)
+        return load(treeNode->left, key, value, type);
+    else
+        return load(treeNode->right, key, value, type);
+}
+StackFrame::treeNode *StackFrame::par(treeNode *treeNode, string key)
+{
+    if (treeNode->left != NULL)
+        if (treeNode->left->key == key)
+            return treeNode;
+    if (treeNode->right != NULL)
+        if (treeNode->right->key == key)
+            return treeNode;
+    if (treeNode == NULL)
+        return NULL;
+    if (cmp(treeNode->key, key) == 0)
+        return par(treeNode->left, key);
+    else
+        return par(treeNode->right, key);
+}
+StackFrame::treeNode *StackFrame::localVarSpaceStore(string key, float value, float type)
+{
+    this->treeRoot = insert(treeRoot, key, value, type);
+    return treeRoot;
+}
+StackFrame::treeNode *StackFrame::localVarSpaceLoad(string key, float *value, float *type)
+{
+    return load(this->treeRoot, key, value, type);
+}
 int StackFrame::commandSpecification(string *command)
 {
     if ((*command)[0] == 'i')
@@ -284,7 +338,8 @@ void StackFrame::commandExecution(string command, string argument)
         {
             int index = atoi(charArr);
             float value, type;
-            //  localVarArrLoad(index, &value, &type);
+            treeNode* tn = localVarSpaceLoad(argument, &value, &type);
+            if(tn==NULL) throw UndefinedVariable(lineCount);
             opStackPush(value, type);
         }
         if (command == "store")
@@ -293,8 +348,7 @@ void StackFrame::commandExecution(string command, string argument)
             opStackPop(&value1, &type1);
             if (type != (int)type1)
                 throw TypeMisMatch(lineCount);
-            int index = atoi(charArr);
-            // localVarArrStore(index, value1, type1);
+             localVarSpaceStore(argument, value1, type1);
         }
     }
     if (command == "top")
@@ -309,13 +363,19 @@ void StackFrame::commandExecution(string command, string argument)
     }
     if (command == "val")
     {
-        int index = atoi(charArr);
         float value, type;
-        //   localVarArrLoad(index, &value, &type);
+        treeNode *tn=localVarSpaceLoad(argument, &value, &type);
+        if(tn==NULL) throw UndefinedVariable(lineCount);
         if (type == 0)
             cout << (int)value << '\n';
         if (type == 1)
             cout << value << '\n';
+    }
+    if(command == "par")
+    {
+        if(argument==treeRoot->key) cout<<"null\n";
+        if(par(treeRoot,argument)==NULL) throw UndefinedVariable(lineCount);
+        cout<<par(treeRoot,argument)->key;
     }
 }
 void StackFrame::run(string filename)
