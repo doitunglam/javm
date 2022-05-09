@@ -5,13 +5,115 @@
 #include "constants.h"
 using namespace std;
 
-StackFrame::StackFrame() : opStackMaxSize(OPERAND_STACK_MAX_SIZE), localVarArrSize(LOCAL_VARIABLE_ARRAY_SIZE)
+StackFrame::StackFrame() : opStackMaxSize(OPERAND_STACK_MAX_SIZE), localVarSpaceSize(LOCAL_VARIABLE_SPACE_SIZE)
 {
     opStackIndex = 0;
     lineCount = 0;
-    localVarArrIndex = 0;
-    for (int i = 0; i < localVarArrSize; i += 2)
-        localVarArr[i] = -1;
+    opStack = new float[opStackMaxSize];
+    currentLocalVarSpaceSize = 0;
+    treeRoot = NULL;
+}
+StackFrame::treeNode::treeNode(string key, float value, float type)
+{
+    this->height = 1;
+    this->key = key;
+    this->left = NULL;
+    this->right = NULL;
+    this->type = type;
+    this->value = value;
+}
+StackFrame::treeNode *StackFrame::rightRotate(treeNode *y)
+{
+    treeNode *x = y->left;
+    treeNode *T2 = x->right;
+
+    // Perform rotation
+    x->right = y;
+    y->left = T2;
+
+    // Update heights
+    y->height = getHeight(y->left) > getHeight(y->right) ? getHeight(y->left) : getHeight(y->right) + 1;
+    x->height = getHeight(x->left) > getHeight(x->right) ? getHeight(x->left) : getHeight(x->right) + 1;
+
+    // Return new root
+    return x;
+}
+StackFrame::treeNode *StackFrame::leftRotate(treeNode *x)
+{
+    treeNode *y = x->right;
+    treeNode *T2 = y->left;
+
+    // Perform rotation
+    y->left = x;
+    x->right = T2;
+
+    // Update heights
+    y->height = getHeight(y->left) > getHeight(y->right) ? getHeight(y->left) : getHeight(y->right) + 1;
+    x->height = getHeight(x->left) > getHeight(x->right) ? getHeight(x->left) : getHeight(x->right) + 1;
+
+    // Return new root
+    return y;
+}
+int StackFrame::getHeight(treeNode *N)
+{
+    if(N==NULL) return 0;
+    return N->height;
+}
+int StackFrame::getBalance(treeNode *N)
+{
+    if (N == NULL)
+        return 0;
+    return getHeight(N->left) - getHeight(N->right);
+}
+StackFrame::treeNode *StackFrame::insert(treeNode *treeNode, string key, float value, float type)
+{
+    currentLocalVarSpaceSize++;
+    /* 1. Perform the normal BST insertion */
+    if (treeNode == NULL)
+        return (new StackFrame::treeNode(key, value, type));
+
+    if (key < treeNode->key)
+        treeNode->left = insert(treeNode->left, key, value, type);
+    else if (key > treeNode->key)
+        treeNode->right = insert(treeNode->right, key, value, type);
+    else // Equal keys are not allowed in BST
+        return treeNode;
+
+    /* 2. Update height of this ancestor treeNode */
+   treeNode->height = getHeight(treeNode->left) > getHeight(treeNode->right) ? getHeight(treeNode->left) : getHeight(treeNode->right) + 1;
+
+    /* 3. Get the balance factor of this ancestor
+        treeNode to check whether this treeNode became
+        unbalanced */
+    int balance = getBalance(treeNode);
+
+    // If this treeNode becomes unbalanced, then
+    // there are 4 cases
+
+    // Left Left Case
+    if (balance > 1 && key < treeNode->left->key)
+        return rightRotate(treeNode);
+
+    // Right Right Case
+    if (balance < -1 && key > treeNode->right->key)
+        return leftRotate(treeNode);
+
+    // Left Right Case
+    if (balance > 1 && key > treeNode->left->key)
+    {
+        treeNode->left = leftRotate(treeNode->left);
+        return rightRotate(treeNode);
+    }
+
+    // Right Left Case
+    if (balance < -1 && key < treeNode->right->key)
+    {
+        treeNode->right = rightRotate(treeNode->right);
+        return leftRotate(treeNode);
+    }
+
+    /* return the (unchanged) AVLTrieeNode pointer */
+    return treeNode;
 }
 bool StackFrame::valueType(string tar)
 {
@@ -50,22 +152,7 @@ void StackFrame::opStackPush(float value, float type)
     opStack[opStackIndex] = type;
     opStackIndex++;
 }
-void StackFrame::localVarArrLoad(int index, float *value, float *type)
-{
-    if (index < 0 || index >= localVarArrSize)
-        throw ArrayOutOfRange(lineCount);
-    if (localVarArr[index] == -1)
-        throw UndefinedVariable(lineCount);
-    (*value) = localVarArr[index + 1];
-    (*type) = localVarArr[index];
-}
-void StackFrame::localVarArrStore(int index, float value, float type)
-{
-    if (index < 0 || index >= localVarArrSize)
-        throw ArrayOutOfRange(lineCount);
-    localVarArr[index] = type;
-    localVarArr[index + 1] = value;
-}
+
 int StackFrame::commandSpecification(string *command)
 {
     if ((*command)[0] == 'i')
@@ -178,18 +265,18 @@ void StackFrame::commandExecution(string command, string argument)
         if (command == "2f")
             opStackPush(value1, 1);
         if (command == "2i")
-            {
-                int value1i=(int)value1;
-                float value1f=(float) value1i;
-                opStackPush(value1f, 0);
-            }
+        {
+            int value1i = (int)value1;
+            float value1f = (float)value1i;
+            opStackPush(value1f, 0);
+        }
     }
     // nhom lenh nap va luu
     if (command == "const" || command == "load" || command == "store")
     {
         if (command == "const")
         {
-            if (valueType(argument)!=(int)type)
+            if (valueType(argument) != (int)type)
                 throw TypeMisMatch(lineCount);
             opStackPush(atof(charArr), type);
         }
@@ -197,17 +284,17 @@ void StackFrame::commandExecution(string command, string argument)
         {
             int index = atoi(charArr);
             float value, type;
-            localVarArrLoad(index, &value, &type);
+            //  localVarArrLoad(index, &value, &type);
             opStackPush(value, type);
         }
         if (command == "store")
         {
             float value1, type1;
             opStackPop(&value1, &type1);
-            if (type!=(int)type1)
+            if (type != (int)type1)
                 throw TypeMisMatch(lineCount);
             int index = atoi(charArr);
-            localVarArrStore(index, value1, type1);
+            // localVarArrStore(index, value1, type1);
         }
     }
     if (command == "top")
@@ -224,7 +311,7 @@ void StackFrame::commandExecution(string command, string argument)
     {
         int index = atoi(charArr);
         float value, type;
-        localVarArrLoad(index, &value, &type);
+        //   localVarArrLoad(index, &value, &type);
         if (type == 0)
             cout << (int)value << '\n';
         if (type == 1)

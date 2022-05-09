@@ -100,18 +100,18 @@ public:
 };
 
 /*
-This exception occurs when trying to access an element that is out of the bound of the local variable array.
+This exception occurs when trying to add a new variable into the full local variable space.
 */
-class ArrayOutOfRange : public std::exception {
+class LocalSpaceFull : public std::exception {
     std::string message; // exception message
 
 public:
     /*
-    Constructor of ArrayOutOfRange
+    Constructor of LocalSpaceFull
     @param line the line number where the exception occurs, starting at 1
     */
-    ArrayOutOfRange(int line) {
-        message = "Array out of range: line " + std::to_string(line);
+    LocalSpaceFull(int line) {
+        message = "Local variable space full: line " + std::to_string(line);
     }
 
     /*

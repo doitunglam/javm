@@ -8,13 +8,25 @@ StackFrame declaration
 */
 class StackFrame
 {
-    int opStackMaxSize;  // max size of operand stack
-    int localVarArrSize; // size of local variable array
-    float opStack[1000];
-    float localVarArr[1000];
+    public:
+    int opStackMaxSize;           // max size of operand stack
+    int currentLocalVarSpaceSize; // size of local variable array
+    float *opStack;
     int opStackIndex;
-    int localVarArrIndex;
     int lineCount;
+    int localVarSpaceSize;
+    struct treeNode
+    {
+        float value;
+        float type;
+        std::string key;
+        treeNode *left;
+        treeNode *right;
+        int height;
+        // Construction With Data
+        treeNode(std::string key, float value, float type);
+    };
+    treeNode *treeRoot;
 
 public:
     /*
@@ -26,11 +38,16 @@ public:
     Run the method written in the testcase
     @param filename name of the file
     */
+    treeNode *rightRotate(treeNode *y);
+    treeNode *leftRotate(treeNode *x);
+    int getBalance(treeNode *N);
+    int getHeight(treeNode *N);
+    treeNode *insert(treeNode *AVLTreeNode, std::string key, float value, float type);
     void elementBreakdowm(std::string inputLine, std::string *command, std::string *argument);
     void opStackPop(float *value, float *type);
     void opStackPush(float value, float type);
-    void localVarArrLoad(int index, float *value, float *type);
-    void localVarArrStore(int index, float value, float type);
+    treeNode* localVarSpaceLoad(std::string key, float *value, float *type);
+    treeNode* localVarSpaceStore(std::string key, float value, float type);
     int commandSpecification(std::string *command);
     void commandExecution(std::string command, std::string argument);
     bool valueType(std::string tar);
