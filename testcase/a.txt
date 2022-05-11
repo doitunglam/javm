@@ -1,0 +1,100 @@
+iconst -1
+istore c
+iconst -4
+par c
+fconst 3.561
+iconst -8
+iconst 8
+top
+val b
+top
+iconst 7
+top
+fstore d
+istore d
+par a
+fdiv
+istore b
+par a
+iconst 2
+val b
+istore d
+irem
+fconst 6.689
+istore d
+iconst 4
+fstore a
+top
+fconst -5.913
+top
+istore c
+istore b
+fstore c
+istore d
+fstore b
+top
+iconst -2
+top
+fstore d
+istore c
+iconst -2
+istore b
+istore d
+iconst -3
+iconst 9
+par b
+istore a
+fconst 6.630
+par b
+istore a
+fstore d
+istore b
+par d
+fconst 2.928
+fstore a
+fconst -9.553
+par d
+par a
+iconst 7
+top
+fsub
+fstore a
+istore a
+istore c
+par d
+fstore d
+fstore b
+top
+val d
+val d
+i2f
+fconst 3.912
+istore b
+istore a
+val d
+fconst 9.430
+top
+top
+ibnot
+fstore b
+fstore c
+iconst 1
+iconst 10
+istore c
+par a
+par c
+val d
+par a
+fconst 7.131
+ieq
+fconst 8.399
+par b
+imul
+val b
+fconst -8.866
+istore d
+fstore c
+val b
+val d
+fstore a
+fconst -3.197

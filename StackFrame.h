@@ -8,25 +8,25 @@ StackFrame declaration
 */
 class StackFrame
 {
-    public:
+public:
     int opStackMaxSize;           // max size of operand stack
     int currentLocalVarSpaceSize; // size of local variable array
     float *opStack;
     int opStackIndex;
     int lineCount;
     int localVarSpaceSize;
-    struct treeNode
+    struct node
     {
         float value;
         float type;
         std::string key;
-        treeNode *left;
-        treeNode *right;
+        node *left;
+        node *right;
         int height;
         // Construction With Data
-        treeNode(std::string key, float value, float type);
+        node(std::string key, float value, float type);
     };
-    treeNode *treeRoot;
+    node *treeRoot;
 
 public:
     /*
@@ -38,19 +38,19 @@ public:
     Run the method written in the testcase
     @param filename name of the file
     */
-    treeNode *rightRotate(treeNode *y);
-    treeNode *leftRotate(treeNode *x);
-    int getBalance(treeNode *N);
-    int getHeight(treeNode *N);
-    bool cmp(std::string s1,std::string s2);
-    treeNode *insert(treeNode *AVLTreeNode, std::string key, float value, float type);
-    treeNode *load(treeNode *AVLTreeNode, std::string key, float *value, float *type);
-    treeNode *par(treeNode *treeNode, std::string key);
+    node *rightRotate(node *y);
+    node *leftRotate(node *x);
+    int getBalance(node *N);
+    int getHeight(node *N);
+    bool cmp(std::string s1, std::string s2);
+    node *insert(node *AVLTreeNode, std::string key, float value, float type);
+    node *load(node *AVLTreeNode, std::string key, float *value, float *type);
+    node *par(node *treeNode, std::string key);
     void elementBreakdowm(std::string inputLine, std::string *command, std::string *argument);
     void opStackPop(float *value, float *type);
     void opStackPush(float value, float type);
-    treeNode* localVarSpaceLoad(std::string key, float *value, float *type);
-    treeNode* localVarSpaceStore(std::string key, float value, float type);
+    node *localVarSpaceLoad(std::string key, float *value, float *type);
+    node *localVarSpaceStore(std::string key, float value, float type);
     int commandSpecification(std::string *command);
     void commandExecution(std::string command, std::string argument);
     bool valueType(std::string tar);

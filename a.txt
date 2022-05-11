@@ -1,0 +1,100 @@
+iconst -2
+istore b
+fconst 8.189
+fstore a
+val a
+iconst 2
+fstore c
+iconst -6
+fstore b
+fstore c
+val a
+fstore d
+fstore c
+iconst -5
+iconst 3
+iconst -2
+fconst 8.426
+istore a
+fstore b
+fstore a
+fstore a
+fstore a
+fstore d
+val a
+fstore c
+iconst -8
+par b
+fconst 5.064
+fconst -6.344
+fstore c
+fconst 2.335
+par b
+top
+top
+fstore d
+par b
+fconst 2.512
+istore b
+top
+istore c
+top
+par a
+top
+fstore a
+fstore d
+par d
+top
+fconst 4.007
+fstore d
+par a
+top
+fstore a
+iconst 2
+fstore b
+top
+istore b
+val d
+par b
+fstore d
+istore b
+fstore c
+fconst -1.781
+fstore b
+fstore d
+fconst 7.184
+top
+iconst 8
+fstore c
+fstore b
+flt
+fneg
+fstore b
+val d
+fconst -3.312
+fconst 2.118
+top
+fstore d
+fstore a
+iconst -7
+fstore d
+val d
+fstore b
+fstore c
+istore c
+top
+fstore c
+val b
+fstore d
+iconst -5
+val a
+top
+par a
+iconst 6
+top
+istore d
+top
+top
+par d
+iconst -6
+iconst -8

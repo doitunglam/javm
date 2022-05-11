@@ -22,8 +22,6 @@ void test(string filename) {
 Main function
 */
 int main(int argc, char **argv) {
-    if (argc < 2)
-        return 1;
-    test(argv[1]);
+    test("a.txt");
     return 0;
 }
